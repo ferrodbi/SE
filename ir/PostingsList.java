@@ -31,7 +31,6 @@ public class PostingsList implements Serializable {
    }
 
     //  YOUR CODE HERE
-    
    public PostingsEntry getByDocID (int docID) { // optimize it 
        //Object[] v = list.toArray();
         //for (Object p : v ){ // 

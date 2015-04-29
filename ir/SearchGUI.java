@@ -25,7 +25,7 @@ import javax.swing.event.*;
  *   A graphical interface to the information retrieval system.
  */
 public class SearchGUI extends JFrame {
-	//s Boolean for indexig
+	// Boolean for indexig
 	boolean shouldIndex = true;
     /**  The indexer creating the search index. */
     Indexer indexer = new Indexer();
@@ -175,27 +175,26 @@ public class SearchGUI extends JFrame {
 		    // we don't want to search at the same time we're indexing new files
 		    // (this might corrupt the index).
 		    synchronized ( indexLock ) {
-			results = indexer.index.search( query, queryType, rankingType, structureType ); 
+		    	results = indexer.index.search( query, queryType, rankingType, structureType );
 		    }
 		    StringBuffer buf = new StringBuffer();
 		    if ( results != null ) {
-			buf.append( "\nFound " + results.size() + " matching document(s)\n\n" );
-			for ( int i=0; i<results.size(); i++ ) {
-			    buf.append( " " + i + ". " );
-			    String filename = indexer.index.docIDs.get( "" + results.get(i).docID );
-			    if ( filename == null ) {
-				buf.append( "" + results.get(i).docID );
-			    }
-			    else {
-				buf.append( filename );
-			    }
-			    if ( queryType == Index.RANKED_QUERY ) {
-				buf.append( "   " + String.format( "%.5f", results.get(i).score )); 
-			    }
-			    buf.append( "\n" );
-			}
-		    }
-		    else {
+		    	buf.append( "\nFound " + results.size() + " matching document(s)\n\n" );
+				for ( int i=0; i<results.size(); i++ ) {
+				    buf.append( " " + i + ". " );
+				    String filename = indexer.index.docIDs.get("" + results.get(i).docID );
+				   // System.out.println("test " + i +": " + indexer.index.docIDs.get("" + results.get(i).docID ));
+				    if ( filename == null ) {
+				    	buf.append( "" + results.get(i).docID );
+				    } else {
+				    	buf.append( filename );
+				    }
+				    if ( queryType == Index.RANKED_QUERY ) {
+				    	buf.append( "   " + String.format( "%.5f", results.get(i).score )); 
+				    }
+				    buf.append( "\n" );
+				}
+			} else {
 			buf.append( "\nFound 0 matching document(s)\n\n" );
 		    }
 		    resultWindow.setText( buf.toString() );
@@ -344,21 +343,20 @@ public class SearchGUI extends JFrame {
     private void index() {
 	    long t1;
 	    if (shouldIndex){
-		synchronized ( indexLock ) {
-		    resultWindow.setText( "\n  Indexing, please wait..." );
-		    t1 = System.nanoTime();
-		    for ( int i=0; i<dirNames.size(); i++ ) {
-				File dokDir = new File( dirNames.get( i ));
-				indexer.processFiles( dokDir );
-		    }
-		    System.out.println("Indexing time is " + (System.nanoTime()-t1)/1e9);
-
-		    resultWindow.setText( "\n  Done!" );
+	    	synchronized ( indexLock ) {
+			    resultWindow.setText( "\n  Indexing, please wait..." );
+			    t1 = System.nanoTime();
+			    for ( int i=0; i<dirNames.size(); i++ ) {
+					File dokDir = new File( dirNames.get( i ));
+					indexer.processFiles( dokDir );
+			    }
+			    System.out.println("Indexing time is " + (System.nanoTime()-t1)/1e9);
+			    resultWindow.setText( "\n  Done!" );
 			}
     	}
     	else {
     		synchronized ( indexLock ) {
-		    	resultWindow.setText( "\n  Indexing, please wait..." );
+		    	resultWindow.setText( "\n  Reindexing, please wait..." );
 		    	//t1 = System.nanoTime();
 		    	for ( int i=0; i<dirNames.size(); i++ ) {
 					File dokDir = new File( dirNames.get( i ));

@@ -15,6 +15,8 @@ public class PostingsEntry implements Comparable<PostingsEntry>, Serializable {
     
     public int docID;
     public double score;
+    public LinkedList<Integer> positions =  new LinkedList<Integer> (); //added
+
 
     public PostingsEntry(int docID, double score) {
         this.docID = docID;
@@ -34,8 +36,6 @@ public class PostingsEntry implements Comparable<PostingsEntry>, Serializable {
     //
     //  YOUR CODE HERE
     //
-    public LinkedList<Integer> positions =  new LinkedList<Integer> ();
-
     public PostingsEntry(int docID, double score, int position) {
         this.docID = docID;
         this.score = score;

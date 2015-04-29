@@ -20,6 +20,7 @@ import java.lang.Math;
 //Implements an inverted index as a Hashtable from words to PostingsLists.
  
 public class HashedIndex implements Index {
+    private boolean recovered = false;
 
     /** The index as a hashtable. */
     private HashMap<String,PostingsList> index = new HashMap<String,PostingsList>();
@@ -31,13 +32,13 @@ public class HashedIndex implements Index {
         PostingsEntry postingsEntry;
         PostingsList postinglist = index.get(token);        
         if (postinglist != null) { 
-            postingsEntry = postinglist.getByDocID(docID);
+            postingsEntry = postinglist.getByDocID(docID); // has to be improved, we need to look for the last element
             if (postingsEntry == null){ 
                 postingsEntry = new PostingsEntry(docID, 0, offset);
             } else {
                 postingsEntry.addPosition(offset);
             }
-            //postinglist.add(postingsEntry);
+           postinglist.add(postingsEntry); // comment
         } else { 
             postinglist = new PostingsList();
             postingsEntry = new PostingsEntry(docID, 0, offset); 
@@ -64,8 +65,10 @@ public class HashedIndex implements Index {
     public PostingsList search( Query query, int queryType, int rankingType, int structureType ) { 
         int size = query.terms.size();
         PostingsList res = null;
-        loadLocal(query);
-        if (size==1) 
+        if (recovered) {
+		loadLocal(query); // DEBUGGING: this part is killing the name recovery
+        }
+	if (size==1) 
             res = index.get(query.terms.poll());
         else{
             PostingsList postingsLists[] = new PostingsList[size];
@@ -216,7 +219,8 @@ public class HashedIndex implements Index {
         }
     }
 
-    public void loadLocal(Query query) {
+    public void loadLocal(Query query) { // Loads the documents from the stored index
+        System.out.println("Loading local ... ");
         String content = "";
         String path = System.getProperty("user.dir") + "/stored/";
         String token = "";
@@ -254,6 +258,8 @@ public class HashedIndex implements Index {
         }
     }
     public void recover() {
+	recovered = true;
+        System.out.println("Recovering from stored files ...");
         String content = "";
         String path = System.getProperty("user.dir") + "/stored/";
         String token = "";
