@@ -9,6 +9,7 @@
 package ir;
 import java.util.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.io.Serializable;
 
@@ -48,6 +49,9 @@ public class PostingsList implements Serializable {
         return null;
         */
    }
+    public void sort () {
+        Collections.sort(list);
+    }
 
    public boolean contains (PostingsEntry pe) {
         return list.contains(pe);
@@ -65,16 +69,17 @@ public class PostingsList implements Serializable {
             list.add(pe);
         } 
     }
-    /*public PostingsEntry poll () {
-        return list.poll();
-    }*/
+    public PostingsEntry poll () {
+        return list.remove(0);
+
+    }
 
     public ListIterator<PostingsEntry> getIterator () {
         return list.listIterator(0);
     }
 
     public ArrayList<PostingsEntry> getList(){
-        return list.clone();
+        return (ArrayList<PostingsEntry>) list.clone();
     }
     /*public LinkedList<PostingsEntry> getList() {
         return (LinkedList<PostingsEntry>)list.clone();

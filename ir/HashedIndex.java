@@ -61,15 +61,37 @@ public class HashedIndex implements Index {
 
     // Searches the index for postings matching the query.
     
-    public PostingsList search( Query query, int queryType, int rankingType, int structureType ) { 
+    public PostingsList search( Query query, int queryType, int rankingType, int structureType ) {
         int size = query.terms.size();
         PostingsList res = null;
         if (recovered) {
-		loadLocal(query); // DEBUGGING: this part is killing the name recovery
+            loadLocal(query); // DEBUGGING: this part is killing the name recovery
         }
-	if (size==1) 
-            res = index.get(query.terms.poll());
-        else{
+        if (size == 1){
+            switch (queryType) {
+                case Index.INTERSECTION_QUERY:
+                case Index.PHRASE_QUERY:
+                    res = index.get(query.terms.poll());
+                    break;
+                case Index.RANKED_QUERY:
+                    res = index.get(query.terms.poll());
+                    double queryTFScore = Math.log(index.size() / res.size()); //idft
+                    for (int i = 0; i < res.size(); i++) {
+                        PostingsEntry pe = res.get(i);
+                        //System.out.println("Matching document " + i );
+                        //System.out.println("DocID:" + pe.docID);
+                        //System.out.println("Index size: " + docLengths.size());
+                        //System.out.println(docLengths.get(""+12));
+                        //System.out.println(pe.positions.size());
+                        pe.setScore(pe.positions.size() * queryTFScore / docLengths.get("" + pe.docID));
+                        //System.out.println("Matching document " + i + ": TfIdfScore: " + pe.getScore());
+                    }
+                    res.sort();
+                    break;
+                default:
+                    break;
+            }
+        }else{
             PostingsList postingsLists[] = new PostingsList[size];
             switch (queryType) {
                 case Index.INTERSECTION_QUERY:
@@ -103,9 +125,15 @@ public class HashedIndex implements Index {
                     double queryTFScore = Math.log(index.size() / res.size()); //idft
                     for (int i=0; i<res.size(); i++){
                         PostingsEntry pe = res.get(i);
-                        pe.setScore(pe.positions.size() * queryTFScore / docLengths.get(pe.docID));
-                        System.out.println("Matching document " + i + ": TfIdfScore: " + pe.getScore());
+                        //System.out.println("Matching document " + i );
+                        //System.out.println("DocID:" + pe.docID);
+                        //System.out.println("Index size: " + docLengths.size());
+                        //System.out.println(docLengths.get(""+12));
+                        //System.out.println(pe.positions.size());
+                        pe.setScore(pe.positions.size() * queryTFScore / docLengths.get("" + pe.docID));
+                        //System.out.println("Matching document " + i + ": TfIdfScore: " + pe.getScore());
                     }
+                    res.sort();
                     //res.sort();
 
                 }
@@ -122,18 +150,18 @@ public class HashedIndex implements Index {
     public PostingsList intersect(PostingsList a, PostingsList b) {
         PostingsList res = new PostingsList();
         if (a != null && b != null) {
-            LinkedList<PostingsEntry> l1 = a.getList();
-            LinkedList<PostingsEntry> l2 = b.getList();
-            PostingsEntry pe1 = l1.poll();
-            PostingsEntry pe2 = l2.poll();
+            ArrayList<PostingsEntry> l1 = a.getList();
+            ArrayList<PostingsEntry> l2 = b.getList();
+            PostingsEntry pe1 = l1.size()>0?l1.remove(0):null;
+            PostingsEntry pe2 = l2.size()>0?l2.remove(0):null;
             while(pe1 != null && pe2 != null){
                 if (pe1.docID == pe2.docID) {
                     res.add(pe1);
-                    pe1 =l1.poll();
-                    pe2 =l2.poll();
+                    pe1 =l1.size()>0?l1.remove(0):null;
+                    pe2 =l2.size()>0?l2.remove(0):null;
                 } else if(pe1.docID < pe2.docID) {
-                    pe1 = l1.poll();
-                } else pe2 = l2.poll();
+                    pe1 = l1.size()>0?l1.remove(0):null;
+                } else pe2 = l2.size()>0?l2.remove(0):null;
             }
         }
         return res;
@@ -143,15 +171,15 @@ public class HashedIndex implements Index {
         PostingsList res = new PostingsList();//DEBUGGING
         //System.out.println("a:: " + a.toString());
         //System.out.println("b:: " + b.toString());
-        LinkedList<PostingsEntry> l1 = null;
-        LinkedList<PostingsEntry> l2 = null;
+        ArrayList<PostingsEntry> l1 = null;
+        ArrayList<PostingsEntry> l2 = null;
         PostingsEntry pe1 = null;
         PostingsEntry pe2 = null;
         if (a != null && b != null) { 
             l1 = a.getList();
             l2 = b.getList();
-            pe1 = l1.poll();
-            pe2 = l2.poll();
+            pe1 = l1.size()>0?l1.remove(0):null;
+            pe2 = l2.size()>0?l2.remove(0):null;
         }
         
         /*DEBUG
@@ -170,8 +198,8 @@ public class HashedIndex implements Index {
                 LinkedList<Integer> laux =  new LinkedList<Integer> ();
                 LinkedList<Integer> p1 = pe1.getList();
                 LinkedList<Integer> p2 = pe2.getList();
-                Integer pp1 = p1.poll();
-                Integer pp2 = p2.poll();
+                Integer pp1 = p1.size()>0?p1.remove(0):null;
+                Integer pp2 = p2.size()>0?p2.remove(0):null;
                 while (pp1 != null){
                     while( pp1 != null &&  pp2 != null) {
                         //System.out.println("Index 1 " + pp1 + " Index 2 " + pp2);
@@ -180,12 +208,12 @@ public class HashedIndex implements Index {
                             if ((pp2 - pp1)>0 && (Math.abs (pp2 - pp1) )<= dif) {
                                 laux.add(pp2);
                                 //System.out.println("added"); //
-                                pp2 = p2.poll();
+                                pp2 = p2.size()>0?p2.remove(0):null;
                             } else if(pp2 > pp1) {
                                 //System.out.println("p1 poll"); //
-                                pp1 = p1.poll();
+                                pp1 = p1.size()>0?p1.remove(0):null;
                                 //break;
-                            } else pp2 = p2.poll();
+                            } else pp2 = p2.size()>0?p2.remove(0):null;
                         }
                         //pp2 = p2.poll();
                        // System.out.println("p2 poll");//
@@ -195,13 +223,13 @@ public class HashedIndex implements Index {
                             laux.remove();    
                         for(Integer p : laux)
                         res.add(new PostingsEntry(pe1.docID, 0, p)); // p was pp1
-                        pp1 = p1.poll();
+                        pp1 = p1.size()>0?p1.remove(0):null;
                 }
-                pe1 =l1.poll();
-                pe2 =l2.poll();
+                pe1 =l1.size()>0?l1.remove(0):null;
+                pe2 =l2.size()>0?l2.remove(0):null;
             } else if (pe1.docID < pe2.docID) {
-            pe1 = l1.poll();
-            } else pe2 = l2.poll();
+            pe1 = l1.size()>0?l1.remove(0):null;
+            } else pe2 = l2.size()>0?l2.remove(0):null;
         }
     return res;
     }
