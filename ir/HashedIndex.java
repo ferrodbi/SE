@@ -6,7 +6,6 @@
  *   Second version: Johan Boye, 2012
  *   Additions: Hedvig Kjellström, 2012-14
  */  
-
 package ir;
 import java.nio.file.*;
 import java.io.*;
@@ -99,6 +98,16 @@ public class HashedIndex implements Index {
                 res = postingsLists[0];
                 for (int i=1;i<size;i++) {
                     res = positionalIntersect(res, postingsLists[i],1);
+                }
+                if(res.size()>0) {
+                    double queryTFScore = Math.log(index.size() / res.size()); //idft
+                    for (int i=0; i<res.size(); i++){
+                        PostingsEntry pe = res.get(i);
+                        pe.setScore(pe.positions.size() * queryTFScore / docLengths.get(pe.docID));
+                        System.out.println("Matching document " + i + ": TfIdfScore: " + pe.getScore());
+                    }
+                    //res.sort();
+
                 }
                 //...
                 break;

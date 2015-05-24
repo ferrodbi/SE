@@ -3,10 +3,9 @@
  *   Information Retrieval course at KTH.
  * 
  *   First version:  Hedvig Kjellström, 2012
- */  
+ */
 
 package ir;
-
 import java.util.LinkedList;
 import java.util.StringTokenizer;
 

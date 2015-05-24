@@ -4,11 +4,10 @@
  * 
  *   First version: Johan Boye, 2012
  *   Additions: Hedvig Kjellström, 2012-14
- */  
+ */
 
 
 package ir;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.BufferedReader;

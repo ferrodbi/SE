@@ -4,10 +4,9 @@
  * 
  *   First version:  Johan Boye, 2010
  *   Second version: Johan Boye, 2012
- */  
+ */
 
 package ir;
-
 import java.io.Serializable;
 import java.util.LinkedList;
 
@@ -29,13 +28,19 @@ public class PostingsEntry implements Comparable<PostingsEntry>, Serializable {
      *  The comparison is defined so that entries will be put in 
      *  descending order.
      */
+
     public int compareTo( PostingsEntry other ) {
-	return Double.compare( other.score, score );
+	   return Double.compare( other.score, score );
     }
 
     //
     //  YOUR CODE HERE
     //
+
+    public void setScore (double score) {
+        this.score = score;
+    }
+    public double getScore () {return score;}
     public PostingsEntry(int docID, double score, int position) {
         this.docID = docID;
         this.score = score;

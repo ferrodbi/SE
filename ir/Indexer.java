@@ -4,11 +4,12 @@
  * 
  *   First version:  Johan Boye, 2010
  *   Second version: Johan Boye, 2012
- */  
+ */
+
+
 
 
 package ir;
-
 import java.io.File;
 import java.io.Reader;
 import java.io.FileReader;
@@ -18,6 +19,7 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.util.LinkedList;
+
 import org.apache.pdfbox.cos.COSDocument;
 import org.apache.pdfbox.pdfparser.*;
 import org.apache.pdfbox.util.PDFTextStripper;

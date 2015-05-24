@@ -4,10 +4,11 @@
  * 
  *   First version:  Johan Boye, 2010
  *   Second version: Johan Boye, 2012
- */  
+ */
 
 package ir;
 import java.util.*;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.io.Serializable;
 
@@ -17,8 +18,8 @@ import java.io.Serializable;
 public class PostingsList implements Serializable {
     
     /** The postings list as a linked list. */
-    private LinkedList<PostingsEntry> list = new LinkedList<PostingsEntry>();
-
+    //private LinkedList<PostingsEntry> list = new LinkedList<PostingsEntry>();
+    private ArrayList<PostingsEntry> list = new ArrayList<PostingsEntry>();
 
     /**  Number of postings in this list  */
     public int size() {
@@ -27,14 +28,15 @@ public class PostingsList implements Serializable {
 
     /**  Returns the ith posting */
     public PostingsEntry get( int i ) {
-        return list.get( i );
+        return list.get(i);
    }
 
     //  YOUR CODE HERE
    public PostingsEntry getByDocID (int docID) { // optimize it 
        //Object[] v = list.toArray();
         //for (Object p : v ){ // 
-       PostingsEntry p = list.getLast();
+       PostingsEntry p = //list.getLast();
+       list.get(list.size()-1);
        if (p!=null && p.docID == docID) return p;
        else return null;/*
         for (PostingsEntry p : list){
@@ -63,17 +65,20 @@ public class PostingsList implements Serializable {
             list.add(pe);
         } 
     }
-    public PostingsEntry poll () {
+    /*public PostingsEntry poll () {
         return list.poll();
-    }
+    }*/
 
     public ListIterator<PostingsEntry> getIterator () {
         return list.listIterator(0);
     }
 
-    public LinkedList<PostingsEntry> getList() {
-        return (LinkedList<PostingsEntry>)list.clone();
+    public ArrayList<PostingsEntry> getList(){
+        return list.clone();
     }
+    /*public LinkedList<PostingsEntry> getList() {
+        return (LinkedList<PostingsEntry>)list.clone();
+    }*/
     
     public String toString() {
         return list.toString();
