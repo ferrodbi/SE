@@ -72,8 +72,8 @@ public class PageRank{
 
 
     public PageRank( String filename ) {
-	int noOfDocs = readDocs( filename );
-	computePagerank( noOfDocs );
+		int noOfDocs = readDocs( filename );
+		computePagerank( noOfDocs );
     }
 
 
