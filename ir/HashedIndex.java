@@ -91,7 +91,7 @@ public class HashedIndex implements Index {
                 default:
                     break;
             }
-        }else{
+        }else{ // size > 1
             PostingsList postingsLists[] = new PostingsList[size];
             switch (queryType) {
                 case Index.INTERSECTION_QUERY:
@@ -113,32 +113,36 @@ public class HashedIndex implements Index {
                 }
                 break;
                 case Index.RANKED_QUERY:
-                //...
-                for (int i=0;i<size;i++) { 
-                    postingsLists[i] = index.get(query.terms.poll());
-                }
-                res = postingsLists[0];
-                for (int i=1;i<size;i++) {
-                    res = positionalIntersect(res, postingsLists[i],1);
-                }
-                if(res.size()>0) {
-                    double queryTFScore = Math.log(index.size() / res.size()); //idft
-                    for (int i=0; i<res.size(); i++){
-                        PostingsEntry pe = res.get(i);
-                        //System.out.println("Matching document " + i );
-                        //System.out.println("DocID:" + pe.docID);
-                        //System.out.println("Index size: " + docLengths.size());
-                        //System.out.println(docLengths.get(""+12));
-                        //System.out.println(pe.positions.size());
-                        pe.setScore(pe.positions.size() * queryTFScore / docLengths.get("" + pe.docID));
-                        //System.out.println("Matching document " + i + ": TfIdfScore: " + pe.getScore());
+                    for (int i=0;i<size;i++) {
+                        postingsLists[i] = index.get(query.terms.poll());
                     }
-                    res.sort();
-                    //res.sort();
+                    res = postingsLists[0];
+                    for (int i=1;i< size;i++){
+                        res.list.addAll(postingsLists[i].list);
+                    }
 
-                }
-                //...
-                break;
+                    for (int i=0; i<res.size(); i++) {
+                        PostingsEntry pe = res.get(i);
+                        pe.setScore(0); // cleaning the previous scores
+                    }
+                    if(res.size()>0) {
+                        double queryTFScore = Math.log(index.size() / res.size()); //idft
+                        for (int i=0; i<res.size(); i++){
+                            PostingsEntry pe = res.get(i);
+                            pe.setScore(pe.getScore() + pe.positions.size() * queryTFScore / docLengths.get("" + pe.docID));
+                           }
+                        res.sort();
+                    }
+                    for (int i=0;i<res.size();i++){
+                        for (int j=i+1;j<res.size();j++){
+                           if (res.get(i).docID==res.get(j).docID){
+                               res.list.remove(j);
+                               j--;
+                            }
+                        }
+                    }
+
+                    break;
                 default: 
                 System.out.println("SEARCH RETURNED A NULL");
                 break;

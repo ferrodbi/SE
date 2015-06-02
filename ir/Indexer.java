@@ -85,7 +85,7 @@ public class Indexer {
 				int docID = generateDocID();
 		    	index.docIDs.put( "" + docID, f.getPath() );
 		    	//test
-		    	System.out.println("Added " + docID + " with path " + f.getPath() );
+		    	//System.out.println("Added " + docID + " with path " + f.getPath() );
 		    	try {
 				    //  Read the first few bytes of the file to see if it is 
 				    // likely to be a PDF 

@@ -20,7 +20,7 @@ public class PostingsList implements Serializable {
     
     /** The postings list as a linked list. */
     //private LinkedList<PostingsEntry> list = new LinkedList<PostingsEntry>();
-    private ArrayList<PostingsEntry> list = new ArrayList<PostingsEntry>();
+    public ArrayList<PostingsEntry> list = new ArrayList<PostingsEntry>();
 
     /**  Number of postings in this list  */
     public int size() {
