@@ -60,29 +60,34 @@ public class Query {
 	// results contain the ranked list from the current search
 	// docIsRelevant contains the users feedback on which of the 10 first hits are relevant
 	//  YOUR CODE HERE
-
-        // alpha-update
+	    // alpha-update
         System.out.println("DEBUG Query: terms size is " + terms.size()+" and weights size is " + weights.size());
-        for(int i=0;i<terms.size();i++){
-            weights.add(i,weights.get(i)*ALPHA);
-
+        if(terms.size() == weights.size()) {
+           for(int i=0;i<terms.size();i++){
+                //weights.add(i, weights.pop()*ALPHA);
+                weights.set(i, weights.get(i)*ALPHA);
+            }
         }
-       System.out.println("DEBUG Query: Weights are " + weights);
+        else {
+            System.out.println("DEBUG Query: terms and weight vector have different size.");
+        }
+        System.out.println("DEBUG Query: Weights are " + weights);
         //positive weight
         ///normalization
         double norm = 0.0;
-        for(int i=0; i<docIsRelevant.length; i++){
+        for(int i=0; i<docIsRelevant.length; i++) {
             if (docIsRelevant[i]) {
                 norm++;//norm = norm + 1;
             }
         }
         norm = 1.0 / norm;
         ///sum
-       System.out.println(indexer.index.invertedIndex.keySet() );
-       if(indexer.index.invertedIndex != null) System.out.println("InvertedIndex is not null" );
-       System.out.println(indexer.index.invertedIndex);
-       System.out.println(indexer.index.invertedIndex.get(891+""));
-       System.out.println(indexer.index.docIDs);
+       //System.out.println(indexer.index.invertedIndex.keySet() );
+       if(indexer.index.invertedIndex != null) {
+           System.out.println("InvertedIndex is not null" );
+       }
+       //System.out.println(indexer.index.invertedIndex);
+       //System.out.println(indexer.index.docIDs);
         for(int i=0; i<docIsRelevant.length; i++) {
             if(docIsRelevant[i]){
                 int id = results.get(i).docID;
@@ -94,8 +99,9 @@ public class Query {
                 if (words != null) {
                     //for(int j=0;j<terms.size();j++){
                       //  String term = terms.get(j);
+                    int j=0;
                     for(String word: words){
-                        System.out.println("DEBUG Query: Term " + word);
+                        //System.out.println("DEBUG Query: Term #" + j +": " +  word +" " +weights.get(j++));
                         PostingsList p = indexer.index.getPostings(word);
                         double tf_score = 0.0;
                         for(PostingsEntry pe:p.list){
@@ -105,19 +111,28 @@ public class Query {
                         }
                         ///sum*norm score
                         tf_score = tf_score/size;
-                        if(!weights.contains(word)){
-                            weights.add(weights.size(), tf_score* BETA * norm);
-                            terms.add(word);
+                        if(!terms.contains(word)){
+                            //weights.add(weights.size(), tf_score* BETA * norm);
+                            weights.addLast(tf_score*BETA*norm);
+                            terms.addLast(word);
                             //debug
-                            if(!weights.contains(word)){System.out.println("DEBUG Query: ADDING TERMS HAS PROBLEMS");
-                        }
-                    } else {
-                        weights.add(weights.indexOf(word), weights.get(weights.indexOf(word))+tf_score*BETA*norm);
+                            if(!terms.contains(word)){
+                                System.out.println("DEBUG Query: ADDING TERMS HAS PROBLEMS");
+                            }
+                        } else {
+                            weights.set(terms.indexOf(word), weights.get(terms.indexOf(word)) + tf_score * BETA * norm);
+                            //weights.add(terms.indexOf(word), weights.get(terms.indexOf(word))+tf_score*BETA*norm);
                         }
                     }
                 } else {System.out.println("DEBUG Query: words is null");}
             }
-        }System.out.println("DEBUG Query: At the end of relevanceFeedback the query contains " + terms.size() + " terms and " + weights.size() + " weights");
+        }
+       System.out.println("DEBUG Query: At the end of relevanceFeedback the query contains " + terms.size() + " terms and " + weights.size() + " weights");
+       if(terms.size() == weights.size()) {
+           for(int i=0;i<terms.size();i++) {
+               System.out.println("Word #" + i + ": " + terms.get(i) + " " + weights.get(i));
+           }
+       }
        System.out.println("DEBUG Query: relevanceFeedback finished!");
     }
 }

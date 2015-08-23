@@ -39,7 +39,7 @@ public class HashedIndex implements Index {
             invertedIndex.put(docID + "'", words);
             //System.out.println("HashMap's key: " + docID + " Hashset: " + words);
         } else {
-            System.out.println(">Term was null for docID #"+docID);
+            //System.out.println(">Term was null for docID #"+docID);
             HashSet<String> hs = new HashSet<String>();
             hs.add(token);
             //System.out.println("HashMap's key: " + docID + " Hashset: " + hs);
@@ -132,8 +132,6 @@ public class HashedIndex implements Index {
                 }
                 break;
                 case Index.RANKED_QUERY:
-                    System.out.println(invertedIndex.get(891+""));
-                    Query copy = query.copy();
                     //size = query.terms.size();
                     System.out.println("DEBUG HashedIndex: size is " + query.terms.size());
                     for (int i=0;i<size;i++) {
