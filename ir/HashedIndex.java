@@ -7,9 +7,11 @@
  *   Additions: Hedvig Kjellström, 2012-14
  */  
 package ir;
+import java.lang.String;
 import java.nio.file.*;
 import java.io.*;
 import java.util.*;
+import java.util.HashSet;
 import java.util.Map.*;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -23,11 +25,28 @@ public class HashedIndex implements Index {
 
     /** The index as a hashtable. */
     private HashMap<String,PostingsList> index = new HashMap<String,PostingsList>();
+    //Reverse index (new)
+    //public HashMap<String,HashSet<String>> invertedIndex = new HashMap<String,HashSet<String>>();
 
      //  Inserts this token in the index.
 
     public void insert( String token, int docID, int offset ) {
         // System.out.print(offset);
+        HashSet<String> words = invertedIndex.get(docID+"");
+        if(words!=null){
+            //invertedIndex.get(docID+"").add(token);
+            words.add(token);
+            invertedIndex.put(docID + "'", words);
+            //System.out.println("HashMap's key: " + docID + " Hashset: " + words);
+        } else {
+            System.out.println(">Term was null for docID #"+docID);
+            HashSet<String> hs = new HashSet<String>();
+            hs.add(token);
+            //System.out.println("HashMap's key: " + docID + " Hashset: " + hs);
+            invertedIndex.put(docID + "", hs);
+
+
+        }
         PostingsEntry postingsEntry;
         PostingsList postinglist = index.get(token);        
         if (postinglist != null) { 
@@ -113,8 +132,15 @@ public class HashedIndex implements Index {
                 }
                 break;
                 case Index.RANKED_QUERY:
+                    System.out.println(invertedIndex.get(891+""));
+                    Query copy = query.copy();
+                    //size = query.terms.size();
+                    System.out.println("DEBUG HashedIndex: size is " + query.terms.size());
                     for (int i=0;i<size;i++) {
-                        postingsLists[i] = index.get(query.terms.poll());
+                        String s = query.terms.get(i);
+                                //query.terms.poll();
+                        postingsLists[i] = index.get(s);
+                        System.out.println("DEBUG HashedIndex: postingslist #"+i+ " " + s);
                     }
                     res = postingsLists[0];
                     for (int i=1;i< size;i++){
@@ -141,7 +167,8 @@ public class HashedIndex implements Index {
                             }
                         }
                     }
-
+                    //query = copy;
+                    System.out.println("DEBUG HashedIndex: at the end size is " + query.terms.size());
                     break;
                 default: 
                 System.out.println("SEARCH RETURNED A NULL");

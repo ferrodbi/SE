@@ -33,7 +33,7 @@ public class PostingsList implements Serializable {
    }
 
     //  YOUR CODE HERE
-   public PostingsEntry getByDocID (int docID) { // optimize it 
+   public PostingsEntry getByDocID (int docID) { // optimize it //only checks the last one, for inserting only
        //Object[] v = list.toArray();
         //for (Object p : v ){ // 
        PostingsEntry p = //list.getLast();
@@ -49,6 +49,13 @@ public class PostingsList implements Serializable {
         return null;
         */
    }
+   /* public PostingsEntry getAllByDocID(int docID) {
+        for (int i=0;i<list.size();i++) {
+            PostingsEntry pe = list.get(i);
+            if(pe.docID==docID)
+                return pe;
+        }
+    }*/
     public void sort () {
         Collections.sort(list);
     }

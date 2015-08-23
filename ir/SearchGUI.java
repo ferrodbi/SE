@@ -205,45 +205,51 @@ public class SearchGUI extends JFrame {
 					    KeyStroke.getKeyStroke( "ENTER" ),
 					    JComponent.WHEN_FOCUSED );
 	
-	Action relevanceFeedbackSearch = new AbstractAction() { 
+	Action relevanceFeedbackSearch = new AbstractAction() {
 		public void actionPerformed( ActionEvent e ) {
-		    // Check that a ranked search has been made prior to the relevance feedback
+			// Temproral test (adding 2 lines of code) Trying to refresh the query
+			String queryString = SimpleTokenizer.normalize( queryWindow.getText() );
+			query = new Query( queryString );
+			//end test
+			System.out.println("DEBUG SearchGUI: query has " + query.terms.size() + " terms");
+			System.out.println(query.weights);
+			// Check that a ranked search has been made prior to the relevance feedback
 		    StringBuffer buf = new StringBuffer();
 		    if (( results != null ) && ( queryType == Index.RANKED_QUERY )) {
-			// Read user relevance feedback selections
-			boolean[] docIsRelevant = { false, false, false, false, false, false, false, false, false, false }; 
-			for ( int i = 0; i<10; i++ ) {
-			    docIsRelevant[i] = feedbackButton[i].isSelected(); 
-			}
+				// Read user relevance feedback selections
+				boolean[] docIsRelevant = { false, false, false, false, false, false, false, false, false, false };
+				for ( int i = 0; i<10; i++ ) {
+			    	docIsRelevant[i] = feedbackButton[i].isSelected();
+				}
 			// Expand the current search query with the documents marked as relevant 
-			query.relevanceFeedback( results, docIsRelevant, indexer );
+				query.relevanceFeedback( results, docIsRelevant, indexer );
+				System.out.println("DEBUG SearchGUI: query has " + query.terms.size() + " terms and " + query.weights.size() + " weights");
 			
 			// Perform a new search with the weighted and expanded query. Access to the index is 
 			// synchronized since we don't want to search at the same time we're indexing new files
 			// (this might corrupt the index).
-			synchronized ( indexLock ) {
-			    results = indexer.index.search( query, queryType, rankingType, structureType );
+				synchronized ( indexLock ) {
+					results = indexer.index.search( query, queryType, rankingType, structureType );
+				}
+				buf.append( "\nSearch after relevance feedback:\n" );
+				buf.append( "\nFound " + results.size() + " matching document(s)\n\n" );
+				for ( int i=0; i<results.size(); i++ ) {
+					buf.append( " " + i + ". " );
+					String filename = indexer.index.docIDs.get( "" + results.get(i).docID );
+					if ( filename == null ) {
+						buf.append( "" + results.get(i).docID );
+					}
+					else {
+						buf.append( filename );
+					}
+					buf.append( "   " + String.format( "%.5f", results.get(i).score ) + "\n" );
+				}
+			} else {
+				buf.append( "\nThere was no returned ranked list to give feedback on.\n\n" );
 			}
-			buf.append( "\nSearch after relevance feedback:\n" );
-			buf.append( "\nFound " + results.size() + " matching document(s)\n\n" );
-			for ( int i=0; i<results.size(); i++ ) {
-			    buf.append( " " + i + ". " );
-			    String filename = indexer.index.docIDs.get( "" + results.get(i).docID );
-			    if ( filename == null ) {
-				buf.append( "" + results.get(i).docID );
-			    }
-			    else {
-				buf.append( filename );
-			    }
-			    buf.append( "   " + String.format( "%.5f", results.get(i).score ) + "\n" );
+			resultWindow.setText( buf.toString() );
+			resultWindow.setCaretPosition( 0 );
 			}
-		    }
-		    else {
-			buf.append( "\nThere was no returned ranked list to give feedback on.\n\n" );
-		    }
-		    resultWindow.setText( buf.toString() );
-		    resultWindow.setCaretPosition( 0 );
-		}
 	    };
 	feedbackExecutor.addActionListener( relevanceFeedbackSearch ); 	
 	

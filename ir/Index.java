@@ -9,6 +9,7 @@
 
 package ir;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 
 public interface Index {
@@ -33,7 +34,7 @@ public interface Index {
 	
     public HashMap<String, String> docIDs = new HashMap<String,String>();
     public HashMap<String,Integer> docLengths = new HashMap<String,Integer>();
-
+    public HashMap<String, HashSet<String>> invertedIndex = new HashMap<String,HashSet<String>>();
     public void insert( String token, int docID, int offset );
     public Iterator<String> getDictionary();
     public PostingsList getPostings( String token );
