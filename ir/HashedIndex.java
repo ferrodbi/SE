@@ -29,9 +29,10 @@ public class HashedIndex implements Index {
     //public HashMap<String,HashSet<String>> invertedIndex = new HashMap<String,HashSet<String>>();
 
      //  Inserts this token in the index.
-
     public void insert( String token, int docID, int offset ) {
-        // System.out.print(offset);
+        //**This is only for Relevance Feedback**
+        //Remove this for speeding-up
+        /*
         HashSet<String> words = invertedIndex.get(docID+"");
         if(words!=null){
             //invertedIndex.get(docID+"").add(token);
@@ -44,9 +45,9 @@ public class HashedIndex implements Index {
             hs.add(token);
             //System.out.println("HashMap's key: " + docID + " Hashset: " + hs);
             invertedIndex.put(docID + "", hs);
-
-
         }
+        */
+        //**Relevance Feedback section ends here.
         PostingsEntry postingsEntry;
         PostingsList postinglist = index.get(token);        
         if (postinglist != null) { 
@@ -79,7 +80,6 @@ public class HashedIndex implements Index {
 
 
     // Searches the index for postings matching the query.
-    
     public PostingsList search( Query query, int queryType, int rankingType, int structureType ) {
         int size = query.terms.size();
         PostingsList res = null;
@@ -150,10 +150,10 @@ public class HashedIndex implements Index {
                         pe.setScore(0); // cleaning the previous scores
                     }
                     if(res.size()>0) {
-                        double queryTFScore = Math.log(index.size() / res.size()); //idft
+                        double queryTFScore = Math.log(((double) index.size()) / (double) res.size()); //idft
                         for (int i=0; i<res.size(); i++){
                             PostingsEntry pe = res.get(i);
-                            pe.setScore(pe.getScore() + pe.positions.size() * queryTFScore / docLengths.get("" + pe.docID));
+                            pe.setScore(pe.getScore() + pe.positions.size() * queryTFScore / (double) docLengths.get("" + pe.docID));
                            }
                         res.sort();
                     }

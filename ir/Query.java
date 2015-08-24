@@ -100,7 +100,7 @@ public class Query {
                     //for(int j=0;j<terms.size();j++){
                       //  String term = terms.get(j);
                     int j=0;
-                    for(String word: words){
+                    for(String word: words) {
                         //System.out.println("DEBUG Query: Term #" + j +": " +  word +" " +weights.get(j++));
                         PostingsList p = indexer.index.getPostings(word);
                         double tf_score = 0.0;

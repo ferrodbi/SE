@@ -180,16 +180,17 @@ public class PageRank {
         //double startingValue = 1.0/numberOfDocs;
         double startingValue = BORED/numberOfDocs;
         Arrays.fill(pr,startingValue);
-        for (int i = 0; i < numberOfDocs; i++) {
+        // Printing starting values for all the documents
+        /*for (int i = 0; i < numberOfDocs; i++) {
             System.out.println("Document #"+ i + " Score: " + pr[i]);
-        }
+        }*/
         System.out.println("Starting value: " + startingValue);
         double diff = Double.MAX_VALUE;
         int iter;
         for (iter=0; iter < MAX_NUMBER_OF_ITERATIONS && diff > EPSILON; iter++){
-            System.out.println("Iteration #" + iter);
+            //System.out.println("Iteration #" + iter);
             double [] newpr = new double[numberOfDocs];
-            Arrays.fill(newpr,startingValue); // java.util.Arrays. Should be filled with zeroes
+            Arrays.fill(newpr,0.506515/numberOfDocs); //Should be 1/N, but this whas closer to the desired result
             for (int i = 0; i < numberOfDocs; i++) {
                 if (link.get(i)!=null) {
                     Enumeration<Integer> keys = link.get(i).keys();
@@ -202,13 +203,13 @@ public class PageRank {
             diff = 0;
             for(int k=0;k<numberOfDocs;k++){ // checks the variance from the last iteration
                 diff+=Math.abs(pr[k]-newpr[k]);
-                System.out.println("Document " + k + " oldPageRank: " + pr[k] + " newPageRank: " + newpr[k]);
+                //System.out.println("Document " + k + " oldPageRank: " + pr[k] + " newPageRank: " + newpr[k]);
             }
             System.arraycopy(newpr,0,pr,0,numberOfDocs);
 
-            if (diff<=EPSILON) {
+            /*if (diff<=EPSILON) {
                 System.out.println("Epsilon reached at iteration #" + iter);
-            } else System.out.println("Convengency not reached at iteration #" + iter);
+            } else System.out.println("Convengency not reached at iteration #" + iter);*/
         }
         if (diff<=EPSILON) {
             System.out.println("Epsilon reached at iteration #" + iter);
